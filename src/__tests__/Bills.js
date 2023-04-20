@@ -12,11 +12,12 @@ import {localStorageMock} from "../__mocks__/localStorage.js"
 import router from "../app/Router.js"
 import Bills from "../containers/Bills.js"
 import { ROUTES } from "../constants/routes.js"
+import mockStore from "../__mocks__/store"
 
 // mock navigation
 const onNavigate = (pathname) => {
-  document.body.innerHTML = ROUTES({ pathname });
-};
+  document.body.innerHTML = ROUTES({ pathname })
+}
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -55,28 +56,33 @@ describe("Given I am connected as an employee", () => {
 
   describe("When I click on the button 'New Bill'", () => {
     test("Then I should be redirected to the page 'New Bill'", () => {
-      //test here line 14 and 20
-      //window.onNavigate(ROUTES_PATH.Bills)
-      
+      //test here lines 14 and 20     
       const bill = new Bills ({document, onNavigate, localStorage: window.localStorage,})
+      const mockHandleClickNewBill = jest.fn((e) => bill.handleClickNewBill())
       const btnNewBill = screen.getByTestId("btn-new-bill")
-      const mockHandleClickNewBill = jest.fn(bill.handleClickNewBill)
-      mockHandleClickNewBill(btnNewBill)
+      btnNewBill.addEventListener("click", mockHandleClickNewBill)
       userEvent.click(btnNewBill)
 
       expect(mockHandleClickNewBill).toHaveBeenCalled()
       expect(screen.getByText("Envoyer une note de frais")).toBeTruthy()
-
-
     })
+  })
 
-    test("Then the function  'HandleCLickIconEye' should be called", () => {
-      //test here line 14
-    })
-    test("Then the modal 'New Bill' should be visible", () => {
-      //test here line 24-27
-
-
+  describe("When I click on the IconEye of a bill", () => {
+    test("Then the bill proof of the related bill should be visible", () => {
+      //test here lines 24-27
+      document.body.innerHTML = BillsUI({ data: bills })
+      //mock the jQuery modal plugin to stimulate a function
+      $.fn.modal = jest.fn()
+      const bill = new Bills({ document, onNavigate, mockStore, localStorage: window.localStorage, })
+      const mockHandleClickIconEye = jest.fn((icon) => bill.handleClickIconEye(icon))
+      const iconEye = screen.getAllByTestId("icon-eye")
+      iconEye.forEach((icon) => {
+        icon.addEventListener("click", mockHandleClickIconEye(icon))
+        userEvent.click(icon)
+      })
+      expect(mockHandleClickIconEye).toHaveBeenCalled()
+      expect($.fn.modal).toHaveBeenCalledWith("show")    
     })
   })
 })
