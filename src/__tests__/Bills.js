@@ -69,7 +69,7 @@ describe("Given I am connected as an employee", () => {
   })
 
   describe("When I click on the IconEye of a bill", () => {
-    test("Then the bill proof of the related bill should be visible", () => {
+    test("Then the bill proof should be visible", () => {
       //test here lines 24-27
       document.body.innerHTML = BillsUI({ data: bills })
       //mock the jQuery modal plugin to stimulate a function
@@ -82,7 +82,19 @@ describe("Given I am connected as an employee", () => {
         userEvent.click(icon)
       })
       expect(mockHandleClickIconEye).toHaveBeenCalled()
-      expect($.fn.modal).toHaveBeenCalledWith("show")    
+      expect(screen.getAllByText("Justificatif")).toBeTruthy()        
+    })
+    test("Then the shown bill proof is the proof of the related bill", async () => {
+      document.body.innerHTML = BillsUI({ data: bills })
+      const bill = new Bills({ document, onNavigate, mockStore, localStorage: window.localStorage, })
+      const mockHandleClickIconEye = jest.fn((icon) => bill.handleClickIconEye(icon))
+      const iconEyeFirstBill = screen.getAllByTestId("icon-eye")[0]
+      iconEyeFirstBill.addEventListener("click", mockHandleClickIconEye(iconEyeFirstBill))
+      userEvent.click(iconEyeFirstBill)
+      const proofFirstBill = await waitFor(() => screen.getByAltText("Bill"))
+
+      expect(iconEyeFirstBill).toHaveAttribute("data-bill-url", "https://test.storage.tld/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a")
+      expect(proofFirstBill).toHaveAttribute("src", "https://test.storage.tld/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a")
     })
   })
 })
