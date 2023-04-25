@@ -29,6 +29,7 @@ describe("Given I am connected as an employee", () => {
     const root = document.createElement("div")
     root.setAttribute("id", "root")
     document.body.append(root)
+    //setup the router
     router()
     //initializing NewBillUI
     window.onNavigate(ROUTES_PATH.NewBill)
@@ -49,36 +50,6 @@ describe("Given I am connected as an employee", () => {
     })
   })
 
-  describe("When I click on Submit button without filling in required inputs", () => {
-    test("It should render the NewBill form page", () => {
-
-      const newBill = new NewBill({ document, onNavigate, mockStore, localStorage: window.localStorage, })
-      //required form inputs are empty
-      const dateInput = screen.getByTestId("datepicker")
-      expect(dateInput.value).toBe("")
-      expect(dateInput).toBeRequired()
-      const amountInput = screen.getByTestId("amount")
-      expect(amountInput.value).toBe("")
-      expect(amountInput).toBeRequired()
-      const pctInput = screen.getByTestId("pct")
-      expect(pctInput.value).toBe("")
-      expect(pctInput).toBeRequired()
-      const fileInput = screen.getByTestId("file")
-      expect(fileInput.value).toBe("")
-      expect(fileInput).toBeRequired()
-
-      const form = screen.getByTestId("form-new-bill")
-      const mockHandleSubmit = jest.fn((e) => newBill.handleSubmit(e))
-      form.addEventListener("submit", mockHandleSubmit)
-      fireEvent.submit(form)
-
-      expect(mockHandleSubmit).toHaveBeenCalled()
-      expect(form).toBeTruthy()
-      //expect(screen.getByTestId("form-new-bill")).toBeTruthy()
-      //expect(screen.getByText("Envoyer une note de frais")).toBeVisible()
-    })
-  })
-
   describe("When I upload the proof file with the wrong format", () => {
     test("It should display an error message", () => {
       // test here
@@ -88,6 +59,27 @@ describe("Given I am connected as an employee", () => {
   describe("When I click on Submit button after filling in correctly all required inputs", () => {
     test("The NewBill should be created and I should be redirected on the Bills page", () => {
       // test here
+      const newBill = new NewBill({ document, onNavigate, mockStore, localStorage: window.localStorage, })
+      screen.getAllByTestId("expense-type").value = "Transports"
+      screen.getAllByTestId("expense-name").value = "TGV Paris-Tlse"
+      screen.getAllByTestId("datepicker").value = "2001-01-01"
+      screen.getAllByTestId("amount").value = "80"
+      screen.getAllByTestId("vat").value = "60"
+      screen.getAllByTestId("pct").value = "20"
+      screen.getAllByTestId("commentary").value = "formation Talend"
+      const testFile = new File(["proof"], "proof.png", {type: "image/png"})
+      const fileInput = screen.getByTestId("file")
+      userEvent.upload(fileInput, testFile)
+      // Make sure the action was successful
+      expect(fileInput.files.length).toBe(1)
+
+      const form = screen.getByTestId("form-new-bill")
+      const mockHandleSubmit = jest.fn((e) => newBill.handleSubmit(e))
+      form.addEventListener("submit", mockHandleSubmit)
+      fireEvent.submit(form)
+
+      expect(mockHandleSubmit).toHaveBeenCalled()
+      expect(screen.getByText("Mes notes de frais")).toBeVisible()
     })
   })
 })
