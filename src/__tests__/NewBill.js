@@ -50,15 +50,23 @@ describe("Given I am connected as an employee", () => {
     })
   })
 
-  describe("When I upload the proof file with the wrong format", () => {
-    test("It should display an error message", () => {
-      // test here
+  describe("When I upload the proof file with the wrong format(other than .jpg, .jpeg, .png)", () => {
+    test("It should not attach the file", () => {
+      const newBill = new NewBill({ document, onNavigate, mockStore, localStorage: window.localStorage, })
+      const invalidFile = new File(["invalidProof"], "invalidProof.png", { type: "document.pdf" })
+      const fileInput = screen.getByTestId("file")
+
+      const mockHadleChangeFIle = jest.fn((e) => newBill.handleChangeFile(e))
+      fileInput.addEventListener("change", mockHadleChangeFIle)
+      fireEvent.change(fileInput, { target: { files: [invalidFile] } })
+
+      expect(mockHadleChangeFIle).toHaveBeenCalled()
+      expect(fileInput.value).toBe("")
     })
   })
 
   describe("When I click on Submit button after filling in correctly all required inputs", () => {
     test("The NewBill should be created and I should be redirected on the Bills page", () => {
-      // test here
       const newBill = new NewBill({ document, onNavigate, mockStore, localStorage: window.localStorage, })
       screen.getAllByTestId("expense-type").value = "Transports"
       screen.getAllByTestId("expense-name").value = "TGV Paris-Tlse"
@@ -72,6 +80,7 @@ describe("Given I am connected as an employee", () => {
       userEvent.upload(fileInput, testFile)
       // Make sure the action was successful
       expect(fileInput.files.length).toBe(1)
+      expect(fileInput.files[0]).toStrictEqual(testFile)
 
       const form = screen.getByTestId("form-new-bill")
       const mockHandleSubmit = jest.fn((e) => newBill.handleSubmit(e))
