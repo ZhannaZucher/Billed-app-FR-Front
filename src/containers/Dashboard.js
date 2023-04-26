@@ -147,7 +147,7 @@ export default class {
     }
 
     bills.forEach(bill => {
-      //fix bug : we remove all unnecessary previous event hanlders 
+      //fix bug : we remove all unnecessary previous event handlers 
       $(`#open-bill${bill.id}`).off("click")
       $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
     })
