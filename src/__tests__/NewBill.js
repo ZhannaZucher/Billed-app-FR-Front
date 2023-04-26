@@ -5,7 +5,6 @@
 import { screen, fireEvent } from "@testing-library/dom"
 import "@testing-library/jest-dom"
 import userEvent from "@testing-library/user-event"
-import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js"
 import { localStorageMock } from "../__mocks__/localStorage.js"
@@ -92,5 +91,3 @@ describe("Given I am connected as an employee", () => {
     })
   })
 })
-
-
