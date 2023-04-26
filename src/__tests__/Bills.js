@@ -7,12 +7,13 @@ import "@testing-library/jest-dom"
 import userEvent from "@testing-library/user-event"
 import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
-import { ROUTES_PATH} from "../constants/routes.js"
+import { ROUTES, ROUTES_PATH} from "../constants/routes.js"
 import {localStorageMock} from "../__mocks__/localStorage.js"
 import router from "../app/Router.js"
 import Bills from "../containers/Bills.js"
-import { ROUTES } from "../constants/routes.js"
 import mockStore from "../__mocks__/store.js"
+
+//jest.mock("../app/Store", () => mockStore)
 
 // mock navigation
 const onNavigate = (pathname) => {
@@ -90,21 +91,24 @@ describe("Given I am connected as an employee", () => {
 describe("GIven I am a user connected as a employee", () => {
   describe("When I navigate to Bills page", () => {
     test("it fetches bills from mock API GET", async () => {
-      //we mock the connection as an employee in the local storage
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Employee', email: "a@a"
       }))
-      //creation of new node
       const root = document.createElement("div")
       root.setAttribute("id", "root")
       document.body.append(root)
       router()
       window.onNavigate(ROUTES_PATH.Bills)
+
       await waitFor(() => screen.getByText("Mes notes de frais"))
       expect(screen.getByText("Mes notes de frais")).toBeTruthy()
 
-    
+      const bills = new Bills({ document, onNavigate, store: mockStore, localStorage: window.localStorage, })
+      const mockGetBills = jest.fn(() => bills.getBills())
+      const mockedData = await mockGetBills()
+      expect(mockGetBills).toHaveBeenCalled()
+      expect(mockedData.length).toBe(4)
     })
   })
 })
