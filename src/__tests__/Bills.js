@@ -13,8 +13,6 @@ import router from "../app/Router.js"
 import Bills from "../containers/Bills.js"
 import mockStore from "../__mocks__/store.js"
 
-//jest.mock("../app/Store", () => mockStore)
-
 // mock navigation
 const onNavigate = (pathname) => {
   document.body.innerHTML = ROUTES({ pathname })
@@ -130,7 +128,19 @@ describe("GIven I am a user connected as a employee", () => {
     })
 
     test("fetching bills from an API fails with 404 message error", async () => {
-
+      //implementation once in order to produce different results for each call
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          list: () => {
+            return Promise.reject(new Error("Erreur 404"))
+          }
+        }
+      })
+      document.body.innerHTML = BillsUI({ error: "Erreur 404" })
+      //defering the execution until the next event loop iteration
+      await new Promise(process.nextTick)
+      const errorMessage = screen.getByText(/Erreur 404/)
+      expect(errorMessage).toBeTruthy()
     })
 
     test("fetching bills from an API fails with 500 message error", async () => {
