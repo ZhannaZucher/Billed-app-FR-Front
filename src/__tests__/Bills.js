@@ -111,4 +111,30 @@ describe("GIven I am a user connected as a employee", () => {
       expect(mockedData.length).toBe(4)
     })
   })
+
+  describe("When an error occurs on API", () => {
+
+    beforeEach(() => {
+      //tracking calls to object'mockstore', returns a mock function bills()
+      jest.spyOn(mockStore, "bills")
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem('user', JSON.stringify({ type: 'Employee', email:"a@a" }))
+      const root = document.createElement("div")
+      root.setAttribute("id", "root")
+      document.body.appendChild(root)
+      router()
+    })
+    afterEach(() => {
+      // restore the spy created with spyOn
+      jest.restoreAllMocks()
+    })
+
+    test("fetching bills from an API fails with 404 message error", async () => {
+
+    })
+
+    test("fetching bills from an API fails with 500 message error", async () => {
+
+    })
+  })
 })
