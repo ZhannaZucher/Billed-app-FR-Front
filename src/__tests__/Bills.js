@@ -144,7 +144,17 @@ describe("GIven I am a user connected as a employee", () => {
     })
 
     test("fetching bills from an API fails with 500 message error", async () => {
-
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          list: () => {
+            return Promise.reject(new Error("Erreur 500"))
+          }
+        }
+      })
+      document.body.innerHTML = BillsUI({ error: "Erreur 500" })
+      await new Promise(process.nextTick)
+      const errorMessage = screen.getByText(/Erreur 500/)
+      expect(errorMessage).toBeTruthy()
     })
   })
 })
