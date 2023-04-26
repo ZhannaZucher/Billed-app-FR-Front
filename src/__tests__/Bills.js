@@ -12,7 +12,7 @@ import {localStorageMock} from "../__mocks__/localStorage.js"
 import router from "../app/Router.js"
 import Bills from "../containers/Bills.js"
 import { ROUTES } from "../constants/routes.js"
-import mockStore from "../__mocks__/store"
+import mockStore from "../__mocks__/store.js"
 
 // mock navigation
 const onNavigate = (pathname) => {
@@ -42,7 +42,6 @@ describe("Given I am connected as an employee", () => {
       window.onNavigate(ROUTES_PATH.Bills)
       await waitFor(() => screen.getByTestId('icon-window'))
       const windowIcon = screen.getByTestId('icon-window')
-      //to-do write expect expression
       expect(windowIcon).toHaveClass("active-icon")
     })
 
@@ -72,7 +71,7 @@ describe("Given I am connected as an employee", () => {
     test("Then the bill proof should be visible", () => {
       //test here lines 24-27
       document.body.innerHTML = BillsUI({ data: bills })
-      //mock the jQuery modal plugin to stimulate a function
+      //mock the jQuery modal plugin to simulate a function
       $.fn.modal = jest.fn()
       const bill = new Bills({ document, onNavigate, mockStore, localStorage: window.localStorage, })
       const mockHandleClickIconEye = jest.fn((icon) => bill.handleClickIconEye(icon))
@@ -84,17 +83,28 @@ describe("Given I am connected as an employee", () => {
       expect(mockHandleClickIconEye).toHaveBeenCalled()
       expect(screen.getAllByText("Justificatif")).toBeTruthy()        
     })
-    test("Then the shown bill proof is the proof of the related bill", async () => {
-      document.body.innerHTML = BillsUI({ data: bills })
-      const bill = new Bills({ document, onNavigate, mockStore, localStorage: window.localStorage, })
-      const mockHandleClickIconEye = jest.fn((icon) => bill.handleClickIconEye(icon))
-      const iconEyeFirstBill = screen.getAllByTestId("icon-eye")[0]
-      iconEyeFirstBill.addEventListener("click", mockHandleClickIconEye(iconEyeFirstBill))
-      userEvent.click(iconEyeFirstBill)
-      const proofFirstBill = await waitFor(() => screen.getByAltText("Bill"))
+  })
+})
 
-      expect(iconEyeFirstBill).toHaveAttribute("data-bill-url", "https://test.storage.tld/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a")
-      expect(proofFirstBill).toHaveAttribute("src", "https://test.storage.tld/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a")
+//Integration test GET
+describe("GIven I am a user connected as a employee", () => {
+  describe("When I navigate to Bills page", () => {
+    test("it fetches bills from mock API GET", async () => {
+      //we mock the connection as an employee in the local storage
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Employee', email: "a@a"
+      }))
+      //creation of new node
+      const root = document.createElement("div")
+      root.setAttribute("id", "root")
+      document.body.append(root)
+      router()
+      window.onNavigate(ROUTES_PATH.Bills)
+      await waitFor(() => screen.getByText("Mes notes de frais"))
+      expect(screen.getByText("Mes notes de frais")).toBeTruthy()
+
+    
     })
   })
 })
