@@ -52,15 +52,31 @@ describe("Given I am connected as an employee", () => {
   describe("When I upload the proof file with the wrong format(other than .jpg, .jpeg, .png)", () => {
     test("It should not attach the file", () => {
       const newBill = new NewBill({ document, onNavigate, mockStore, localStorage: window.localStorage, })
-      const invalidFile = new File(["invalidProof"], "invalidProof.png", { type: "document.pdf" })
+      const invalidFile = new File(["invalidProof"], "invalidProof.png", { type: "document/pdf" })
       const fileInput = screen.getByTestId("file")
 
-      const mockHadleChangeFIle = jest.fn((e) => newBill.handleChangeFile(e))
-      fileInput.addEventListener("change", mockHadleChangeFIle)
+      const mockHandleChangeFIle = jest.fn((e) => newBill.handleChangeFile(e))
+      fileInput.addEventListener("change", mockHandleChangeFIle)
       fireEvent.change(fileInput, { target: { files: [invalidFile] } })
 
-      expect(mockHadleChangeFIle).toHaveBeenCalled()
+      expect(mockHandleChangeFIle).toHaveBeenCalled()
       expect(fileInput.value).toBe("")
+    })
+  })
+
+  describe("When I upload the proof file with the correct format(.jpg, .jpeg or .png)", () => {
+    test("It should update the input field", () => {
+      const newBill = new NewBill({ document, onNavigate, mockStore, localStorage: window.localStorage, })
+      const testFile = new File(["validProof"], "validProof.jpg", { type: "image/jpg" })
+      const fileInput = screen.getByTestId("file")
+
+      const mockHandleChangeFIle = jest.fn((e) => newBill.handleChangeFile(e))
+
+      fileInput.addEventListener("change", mockHandleChangeFIle)
+      fireEvent.change(fileInput, { target: { files: [testFile] } })
+
+      expect(mockHandleChangeFIle).toHaveBeenCalled()
+      expect(fileInput.files[0]).toStrictEqual(testFile)
     })
   })
 
