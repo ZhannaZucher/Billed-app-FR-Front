@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { screen, fireEvent } from "@testing-library/dom"
+import { screen, fireEvent, waitFor } from "@testing-library/dom"
 import "@testing-library/jest-dom"
 import userEvent from "@testing-library/user-event"
 import NewBill from "../containers/NewBill.js"
@@ -80,30 +80,68 @@ describe("Given I am connected as an employee", () => {
     })
   })
 
+  //Integration test POST
   describe("When I click on Submit button after filling in correctly all required inputs", () => {
-    test("The NewBill should be created and I should be redirected on the Bills page", () => {
+    test("The NewBill should be created and I should be redirected on the Bills page", async() => {
+      const newBill = new NewBill({ document, onNavigate, store: null, localStorage: window.localStorage, })
+
+      const testBill = {
+        type: "Transport",
+        name: "TGV Paris Tlse",
+        date: "2023-04-27",
+        amount: 40,
+        vat: 60,
+        pct: 20,
+        commentary: "commentary",
+        fileUrl: "../img/ticket.jpg",
+        fileName: "ticket.jpg",
+        status: "pending",
+      };
+      screen.getAllByTestId("expense-type").value = testBill.type
+      screen.getAllByTestId("expense-name").value = testBill.name
+      screen.getAllByTestId("datepicker").value = testBill.date
+      screen.getAllByTestId("amount").value = testBill.amount
+      screen.getAllByTestId("vat").value = testBill.vat
+      screen.getAllByTestId("pct").value = testBill.pct
+      screen.getAllByTestId("commentary").value = testBill.commentary
+      newBill.fileName = testBill.fileName
+      newBill.fileUrl = testBill.fileUrl
+
+      const form = screen.getByTestId("form-new-bill")
+      newBill.updateBill = jest.fn()
+      const mockHandleSubmit = jest.fn((e) => newBill.handleSubmit(e))
+      form.addEventListener("submit", mockHandleSubmit)
+      fireEvent.submit(form)
+
+      expect(mockHandleSubmit).toHaveBeenCalled()
+      expect(newBill.updateBill).toHaveBeenCalled()
+
+      await waitFor(() => screen.getByText("Mes notes de frais"))
+      expect(screen.getByText("Mes notes de frais")).toBeVisible()
+    })
+
+    test("the fetch to an API fails with 500 message error", async () => {
+      //tracking calls to object'mockstore', returns a mock function bills()
+      jest.spyOn(mockStore, "bills")
+      //console.error = jest.fn()
+      jest.spyOn(console, 'error').mockImplementation(() => { })
       const newBill = new NewBill({ document, onNavigate, mockStore, localStorage: window.localStorage, })
-      screen.getAllByTestId("expense-type").value = "Transports"
-      screen.getAllByTestId("expense-name").value = "TGV Paris-Tlse"
-      screen.getAllByTestId("datepicker").value = "2001-01-01"
-      screen.getAllByTestId("amount").value = "80"
-      screen.getAllByTestId("vat").value = "60"
-      screen.getAllByTestId("pct").value = "20"
-      screen.getAllByTestId("commentary").value = "formation Talend"
-      const testFile = new File(["proof"], "proof.png", {type: "image/png"})
-      const fileInput = screen.getByTestId("file")
-      userEvent.upload(fileInput, testFile)
-      // Make sure the action was successful
-      expect(fileInput.files.length).toBe(1)
-      expect(fileInput.files[0]).toStrictEqual(testFile)
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          update: () => {
+            return Promise.reject(new Error("Erreur 500"))
+          }
+        }
+      })
+      window.onNavigate(ROUTES_PATH.NewBill)
 
       const form = screen.getByTestId("form-new-bill")
       const mockHandleSubmit = jest.fn((e) => newBill.handleSubmit(e))
       form.addEventListener("submit", mockHandleSubmit)
       fireEvent.submit(form)
 
-      expect(mockHandleSubmit).toHaveBeenCalled()
-      expect(screen.getByText("Mes notes de frais")).toBeVisible()
+      await new Promise(process.nextTick)
+      expect(console.error).toBeCalled()
     })
   })
 })
