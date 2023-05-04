@@ -21,7 +21,7 @@ export default class NewBill {
 
     //authorized file type restriction for upload
     const validFormat = ["image/jpg", "image/png", "image/jpeg",]
-    const fileType = file.type;
+    const fileType = file.type.toLowerCase()
 
     //check for accepted file formats  
     if (validFormat.includes(fileType)) { 
