@@ -18,17 +18,19 @@ export default class NewBill {
   handleChangeFile = e => {
     e.preventDefault()
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
-    const filePath = e.target.value.split(/\\/g)
-    const fileName = filePath[filePath.length-1]
 
-    //extraction of file extension
-    const fileType = fileName.split('.').pop().toLowerCase()
-    const validFormat = ["jpg", "png", "jpeg"]
-    const formData = new FormData()
-    const email = JSON.parse(localStorage.getItem("user")).email
+    //authorized file type restriction for upload
+    const validFormat = ["image/jpg", "image/png", "image/jpeg",]
+    const fileType = file.type;
 
-    //check for accepted file formats
-    if (validFormat.includes(fileType)) {
+    //check for accepted file formats  
+    if (validFormat.includes(fileType)) { 
+
+      const filePath = e.target.value.split(/\\/g)
+      console.log(filePath);
+      const fileName = filePath[filePath.length - 1]
+      const formData = new FormData()
+      const email = JSON.parse(localStorage.getItem("user")).email
       formData.append('file', file)
       formData.append('email', email)
       this.store
