@@ -25,9 +25,7 @@ export default class NewBill {
 
     //check for accepted file formats  
     if (validFormat.includes(fileType)) { 
-
       const filePath = e.target.value.split(/\\/g)
-      console.log(filePath);
       const fileName = filePath[filePath.length - 1]
       const formData = new FormData()
       const email = JSON.parse(localStorage.getItem("user")).email
