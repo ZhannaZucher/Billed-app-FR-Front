@@ -4,7 +4,6 @@
 
 import { screen, fireEvent, waitFor } from "@testing-library/dom"
 import "@testing-library/jest-dom"
-import userEvent from "@testing-library/user-event"
 import NewBill from "../containers/NewBill.js"
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js"
 import { localStorageMock } from "../__mocks__/localStorage.js"
@@ -66,7 +65,7 @@ describe("Given I am connected as an employee", () => {
 
   describe("When I upload the proof file with the correct format(.jpg, .jpeg or .png)", () => {
     test("It should update the input field", () => {
-      const newBill = new NewBill({ document, onNavigate, mockStore, localStorage: window.localStorage, })
+      const newBill = new NewBill({ document, onNavigate, store: mockStore, localStorage: window.localStorage, })
       const testFile = new File(["validProof"], "validProof.jpg", { type: "image/jpg" })
       const fileInput = screen.getByTestId("file")
 
@@ -123,8 +122,12 @@ describe("Given I am connected as an employee", () => {
     test("the fetch to an API fails with 500 message error", async () => {
       //tracking calls to object'mockstore', returns a mock function bills()
       jest.spyOn(mockStore, "bills")
-      //console.error = jest.fn()
+      //tracking console.error
       jest.spyOn(console, 'error').mockImplementation(() => { })
+
+      Object.defineProperty(window, 'location', { value: { hash: ROUTES_PATH['NewBill'] } })
+      router()
+
       const newBill = new NewBill({ document, onNavigate, mockStore, localStorage: window.localStorage, })
       mockStore.bills.mockImplementationOnce(() => {
         return {
@@ -133,7 +136,6 @@ describe("Given I am connected as an employee", () => {
           }
         }
       })
-      window.onNavigate(ROUTES_PATH.NewBill)
 
       const form = screen.getByTestId("form-new-bill")
       const mockHandleSubmit = jest.fn((e) => newBill.handleSubmit(e))
