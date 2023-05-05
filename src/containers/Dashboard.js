@@ -171,7 +171,7 @@ export default class {
         return bills
       })
       .catch(error => {
-        throw error;
+        throw error
       })
     }
   }
