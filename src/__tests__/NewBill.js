@@ -95,7 +95,7 @@ describe("Given I am connected as an employee", () => {
         fileUrl: "../img/ticket.jpg",
         fileName: "ticket.jpg",
         status: "pending",
-      };
+      }
       screen.getAllByTestId("expense-type").value = testBill.type
       screen.getAllByTestId("expense-name").value = testBill.name
       screen.getAllByTestId("datepicker").value = testBill.date
