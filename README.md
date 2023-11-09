@@ -1,94 +1,56 @@
+# Billed app
 
-## L'architecture du projet :
-Ce projet, dit frontend, est connecté à un service API backend que vous devez aussi lancer en local.
+## Presentation
+Tested and debugged SaaS RH
 
-Le projet backend se trouve ici: https://github.com/OpenClassrooms-Student-Center/Billed-app-FR-back
+![Billed](screenshot1.png)
 
-## Organiser son espace de travail :
-Pour une bonne organization, vous pouvez créer un dossier bill-app dans lequel vous allez cloner le projet backend et par la suite, le projet frontend:
+Employee path:
+![Billed](screenshot_employee.png)
 
-Clonez le projet backend dans le dossier bill-app :
+Admin path:
+![Billed](screenshot_admin.png)
+
+## Project goals
+### 1. Debugg application. Issues [here](https://openclassrooms.notion.site/a7a612fc166747e78d95aa38106a55ec?v=2a8d3553379c4366b6f66490ab8f0b90)
+
+### 2. Cover application by unit and integration tests. 
+   
+   Coverage report:
+   ![jest](jest_coverage.png)
+   ![global](coverage_report.png)
+
+### 3. Create an E2E testing strategy for employee path.
+   E2E plan [here](https://github.com/ZhannaZucher/Billed-app-FR-Front/blob/main/E2E_strategy.pdf)
+
+
+## Project setup
+1. Install the source code to run the API forking and cloning it from [here](https://github.com/OpenClassrooms-Student-Center/Billed-app-FR-back)
+
+2. Clone the UI source code [here](https://github.com/ZhannaZucher/Billed-app-FR-Front)
+
+### Step 1 -  Launch backend :
+
+Follow instructions to launch the API disponible in Backend repo[here](https://github.com/OpenClassrooms-Student-Center/Billed-app-FR-Front/blob/main/README.md). 
+
+### Step 2 - Launch frontend :
+
+Install the dependencies with <code>npm install</code> command in the terminal.
+
+Launch the application with your Live Server
+
+
+## User accounts :
+
+Sign in with created accounts:
+
+### admin : 
 ```
-$ git clone https://github.com/OpenClassrooms-Student-Center/Billed-app-FR-Back.git
+user : admin@test.tld 
+password : admin
 ```
-
+### employee :
 ```
-bill-app/
-   - Billed-app-FR-Back
-```
-
-Clonez le projet frontend dans le dossier bill-app :
-```
-$ git clone https://github.com/OpenClassrooms-Student-Center/Billed-app-FR-Front.git
-```
-
-```
-bill-app/
-   - Billed-app-FR-Back
-   - Billed-app-FR-Front
-```
-
-## Comment lancer l'application en local ?
-
-### étape 1 - Lancer le backend :
-
-Suivez les indications dans le README du projet backend.
-
-### étape 2 - Lancer le frontend :
-
-Allez au repo cloné :
-```
-$ cd Billed-app-FR-Front
-```
-
-Installez les packages npm (décrits dans `package.json`) :
-```
-$ npm install
-```
-
-Installez live-server pour lancer un serveur local :
-```
-$ npm install -g live-server
-```
-
-Lancez l'application :
-```
-$ live-server
-```
-
-Puis allez à l'adresse : `http://127.0.0.1:8080/`
-
-
-## Comment lancer tous les tests en local avec Jest ?
-
-```
-$ npm run test
-```
-
-## Comment lancer un seul test ?
-
-Installez jest-cli :
-
-```
-$npm i -g jest-cli
-$jest src/__tests__/your_test_file.js
-```
-
-## Comment voir la couverture de test ?
-
-`http://127.0.0.1:8080/coverage/lcov-report/`
-
-## Comptes et utilisateurs :
-
-Vous pouvez vous connecter en utilisant les comptes:
-
-### administrateur : 
-```
-utilisateur : admin@test.tld 
-mot de passe : admin
-```
-### employé :
-```
-utilisateur : employee@test.tld
-mot de passe : employee
+user : employee@test.tld
+password : employee
 ```
